@@ -29,7 +29,6 @@ class Network():
         self.biases = biases
 
         self.activations = []
-        #self.ableitungen = []
         self.derivations = []
 
         self.cost = CrossEntropy()
@@ -53,16 +52,12 @@ class Network():
 
 
     def predict(self, x):
-        #print(x)
         self.activations.append(x)
 
         for w, b in zip(self.weights, self.biases):
 
             a = np.dot(w, self.activations[-1]) + b
-            #print("a", a)
-            #print("a shape: ", a.shape)
             c = self.calculate_Sigmoid(a)
-            #print("bbb: ", c)
             self.activations.append(c)
 
         print(f"predicted result {self.activations[-1]}")
@@ -72,14 +67,10 @@ class Network():
         return prediction
 
 
-
-
-
     #check
     def calculate_Sigmoid(self, x):
 
         out = 1 / (1 + np.exp(-x))
-        #print(out)
         return out
 
     #check
@@ -94,11 +85,10 @@ class Network():
 
         return x * (1 - x)
 
+
     #check
     def feedForward(self, startwerte):
 
-        #print(startwerte)
-        #print(startwerte.shape)
 
         self.activations.append(startwerte)
         for w, b in zip(self.weights, self.biases):
@@ -112,9 +102,6 @@ class Network():
 
             sol = self.calc_Sigmoid_ableitung_easy(x)
             self.derivations.append(sol)
-
-        #print("solution given", self.activations[-1])
-
 
 
 
@@ -140,9 +127,8 @@ class Network():
 
         all_errors = []
         error_of_last_layer = self.calculate_error_in_last_layer(sollwerte)
-        #print(error_of_last_layer.shape)
         all_errors.append(error_of_last_layer)
-        #gesucht
+
         rev_derivations = list(reversed(self.derivations[:-1]))
         rev_weights = list(reversed(self.weights[1:]))
 
@@ -156,9 +142,9 @@ class Network():
         return errors_from_1st_to_last
 
 
-    def calculate_deltas(self, sollwerte):
+    def calculate_deltas(self, target_value):
 
-        errors = self.calculate_error(sollwerte)
+        errors = self.calculate_error(target_value)
         delta_weights = []
         delta_biases = []
 
@@ -172,11 +158,11 @@ class Network():
         return delta_weights, delta_biases
 
 
-    def backprob(self, startwerte, sollwerte):
+    def backprob(self, start_value, target_value):
 
-        self.feedForward(startwerte)
+        self.feedForward(start_value)
 
-        delta_w, delta_b = self.calculate_deltas(sollwerte)
+        delta_w, delta_b = self.calculate_deltas(target_value)
 
         self.activations.clear()
         self.derivations.clear()
@@ -202,12 +188,10 @@ class Network():
 
                 ab = ab.reshape(db.shape)
                 ab += db
-        #print("weights", self.weights)
+
         lamda = 5.0
         new_weights = [ (1-eta*(lamda/50000))* og_w - ( (eta/batch_size) * dw) for og_w, dw in zip(self.weights, adding_deltas_weights) ]
-        #print("new weights", new_weights)
         new_biases = [og_b - ( (eta/batch_size) * db) for og_b, db in zip(self.biases, adding_deltas_biases) ]
-        #print("new biases:", new_biases)
 
         self.weights = new_weights
         self.biases = new_biases
@@ -229,13 +213,12 @@ class Network():
             for mini_batch in mini_batches:
                 counter += 1
                 self.update_mini_batch(mini_batch, 0.1)
-                #print(f"finished minbatch number: {counter} of {len(mini_batches)} in epoch {i}")
 
             if test_data is not None:
                 self.evaluate(test_data)
 
             print(f"FINISHED number {i + 1} of {epochs} EPOCHS")
-            #print()
+
 
     def evaluate(self, test_data):
         count = 0
@@ -247,9 +230,6 @@ class Network():
                 count += 1
 
         print(f"{count} / {len(test_data)}")
-
-
-
 
 
 def create_network(data):
@@ -287,29 +267,36 @@ def create_network(data):
 
     network = Network(weights, biases)
     network.create_mini_batches(training_data, 30, 10, test_data)
-    #network.safe_network()
-    print("saved")
+
+    if false:
+        network.safe_network()
+        print("saved")
 
     return network
 
 
 
-#setup.prep_digital()
-#data = setup.load_digital_numbers()
-data = setup.load_local_mnist()
+def run():
+    # setup.prep_digital()
+    # data = setup.load_digital_numbers()
+    data = setup.load_local_mnist()
 
-for x in data:
-    print(len(x))
-    print(type(x))
-    print(x[0])
+    for x in data:
+        print(len(x))
+        print(type(x))
+        print(x[0])
 
-img = data[1][0]
-img = setup.recreate_img(img)
-img = np.reshape(img, (28, 28))
-plt.imshow(img, interpolation='nearest')
-plt.gray()
-print('yo yo ', data[3][0])
-plt.show()
+    img = data[1][0]
+    img = setup.recreate_img(img)
+    img = np.reshape(img, (28, 28))
+    plt.imshow(img, interpolation='nearest')
+    plt.gray()
+    print(data[3][0])
+    plt.show()
+
+    network = create_network(data)
 
 
-network = create_network(data)
+if __name__ == '__main__':
+
+    run()

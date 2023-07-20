@@ -13,17 +13,12 @@ def normalize(value):
 
     new_value = (value * (2 / max_value)) - 1
 
-
-    #print(f'new value: {new_value}')
-
-    #new_value = np.round(new_value, 2)
     return new_value
 
 
 def preprocess_data(data):
 
     # 255 --> schwarz
-    print('yo')
     first_list = data[0]
     sec_list = data[1]
 
@@ -40,7 +35,6 @@ def preprocess_data(data):
         print(x)
 
     data = [norm_images, one_hot_labels]
-
 
     with open("data/digital_numbers.pickle", 'wb') as f:
         pickle.dump(data, f)
@@ -86,11 +80,9 @@ def prep_digital():
     with open('data/digital_numbers.pickle', 'rb') as handle:
         data = pickle.load(handle)
 
-    #print(len(data[0]))
     images = data[0]
     labels = data[1]
     split = int(len(images) *0.8)
-    #print(split)
 
     train_imgs = []
     test_imgs = []
@@ -115,10 +107,6 @@ def prep_digital():
 
     train_labels = np.array(train_labels)
     test_labels = np.array(test_labels)
-
-
-
-
 
 
     data = (train_imgs, test_imgs, train_labels, test_labels)
